@@ -1,10 +1,11 @@
 const express = require("express");
 const { createTodo, updateTodo } = require("./types");
+const { todo } = require("./db");
 const app = express();
 
 app.use(express.json());
 
-app.post("/todo", function (req, res) {
+app.post("/todo", async function (req, res) {
   const createPayload = req.body;
   const parsedPayload = createTodo.safeParse(createPayload);
 
@@ -13,13 +14,29 @@ app.post("/todo", function (req, res) {
       msg: "You sent the wrong inputs!",
     });
     return;
-  } else {
   }
+
+  //wait for the database updation
+  await todo.create({
+    title: createPayload.title,
+    description: createPayload.description,
+    completed: false,
+  });
+
+  res.json({
+    msg: "Todo created!",
+  });
 });
 
-app.get("/todos", function (req, res) {});
+app.get("/todos", async function (req, res) {
+  const todos = await todo.find();
 
-app.put("/completed", function (req, res) {
+  res.json({
+    response: todos,
+  });
+});
+
+app.put("/completed", async function (req, res) {
   const createPayload = req.body;
   const parsedPayload = updateTodo.safeParse(createPayload);
 
@@ -28,6 +45,18 @@ app.put("/completed", function (req, res) {
       msg: "You sent wrong inputs!",
     });
     return;
-  } else {
   }
+
+  await todo.update(
+    {
+      _id: req.body.id,
+    },
+    {
+      completed: true,
+    }
+  );
+
+  res.json({
+    msg: "Todo marked as completed!",
+  });
 });
