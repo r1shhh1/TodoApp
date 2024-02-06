@@ -1,16 +1,18 @@
 const express = require("express");
 const { createTodo, updateTodo } = require("./types");
 const { todo } = require("./db");
+const cors = require("cors");
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.post("/todo", async function (req, res) {
   const createPayload = req.body;
   const parsedPayload = createTodo.safeParse(createPayload);
 
   if (!parsedPayload.success) {
-    req.statusCode(404).json({
+    res.status(404).json({
       msg: "You sent the wrong inputs!",
     });
     return;
