@@ -1,5 +1,4 @@
 export function Todos({ todos }) {
-  console.log("dfaj", todos);
   return (
     <div>
       {todos.map(function (todo) {
@@ -7,7 +6,22 @@ export function Todos({ todos }) {
           <div>
             <h1>{todo.title}</h1>
             <h2>{todo.description}</h2>
-            <button>
+            <button
+              onClick={() => {
+                fetch("http://localhost:3000/completed", {
+                  method: "PUT",
+                  body: JSON.stringify({
+                    id: todo._id,
+                  }),
+                  headers: {
+                    "Content-type": "application/json",
+                  },
+                }).then(async function (res) {
+                  const json = await res.json();
+                  alert("Todo marked done!");
+                });
+              }}
+            >
               {todo.completed == true ? "Completed" : "Mark as Complete"}
             </button>
           </div>
